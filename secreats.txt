@@ -1,0 +1,50 @@
+Here's everything I changed in the project folder after you showed the push error:
+
+  1. Removed hardcoded secrets from source files
+
+  ┌─────────────────────────────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────┐
+  │                        File                         │                                      What changed                                      │
+  ├─────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────┤
+  │ CloudRun_Backend_WebApp/server.js                   │ Replaced hardcoded GOOGLE_CLIENT_ID with process.env.GOOGLE_CLIENT_ID; removed the     │
+  │                                                     │ client secret (GOCSPX-...) that was sitting in a comment                               │
+  ├─────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────┤
+  │ CloudRun_Backend_WebApp/public/index.html           │ Client ID was hardcoded in google.accounts.id.initialize() — now fetches it from       │
+  │                                                     │ /api/config at runtime                                                                 │
+  ├─────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────┤
+  │ android-ws/ESP32LedApp/app/build.gradle             │ Both SERVER_URL and GOOGLE_CLIENT_ID changed from real values to placeholders          │
+  ├─────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────┤
+  │ Iot-project-arduino-code/ws-android-iot-project.ino │ Cloud Run URL with project number → placeholder                                        │
+  ├─────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────┤
+  │ android-ws/interaction.json                         │ Client ID → placeholder                                                                │
+  ├─────────────────────────────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────┤
+  │ android-ws/Android_built_explanation.txt            │ Reference to client ID → placeholder                                                   │
+  └─────────────────────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────┘
+
+  2. Removed tracked build artifacts from git
+
+  The android-ws/ESP32LedApp/app/build/ directory (APK build output + generated BuildConfig.java with the hardcoded client ID) was tracked in git.
+  Ran git rm --cached to untrack it.
+
+  3. New files created
+
+  - .gitignore — Ignores build/, .env, node_modules/, *.apk, IDE files, details_fin.txt
+  - CloudRun_Backend_WebApp/.env.example — Template showing required env vars (SPREADSHEET_ID, AUTH_TOKEN, GOOGLE_CLIENT_ID)
+
+  4. Removed personal notes from tracking
+
+  details_fin.txt (your personal GCP notes with project IDs, URLs, sheet IDs) was tracked. Added to .gitignore and removed from git tracking with
+  git rm --cached.
+
+  5. Added a /api/config endpoint
+
+  In server.js, added GET /api/config that returns { googleClientId } so the frontend doesn't need the client ID hardcoded.
+
+  ---
+  The one thing that still hasn't been done (because you pushed before doing it): staging and amending the commit. Since all these fixes are only on
+  disk, the original commit still has the secrets. When you're ready:
+
+  git add -A
+  git commit --amend --no-edit
+  git push rak_soc master --force-with-lease
+
+✻ Churned for 5s
