@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESP32 LED Control</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <style>
+    body { text-align: center; margin-top: 2rem; }
+    button { width: 80%; max-width: 300px; padding: 1rem; font-size: 1.5rem; }
+    .status { margin-top: 1rem; }
+    #signin { margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <h1>ESP32 LED Control</h1>
+  <div id="signin"></div>
+  <button id="toggleBtn" style="display:none">Turn On</button>
+  <div class="status" id="status"></div>
+
+  <script>
+    let userToken = null;
+    let ledState = false;
+
+    // Google Sign-In callback
+    function handleCredentialResponse(response) {
+      userToken = response.credential;
+      // Immediately verify with server
+      fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + userToken }
+      })
+      .then(res => {
+        if (res.ok) {
+          // User allowed – show toggle button
+          document.getElementById('signin').innerHTML = '';
+          document.getElementById('toggleBtn').style.display = 'inline-block';
+        } else {
+          // User not allowed – show error and sign out
+          document.getElementById('signin').innerHTML = '<p style="color:red">Access denied. You are not an authorised user.</p>';
+          google.accounts.id.disableAutoSelect();
+          google.accounts.id.revoke(userToken, () => {});
+        }
+      })
+      .catch(() => {
+        document.getElementById('signin').innerHTML = '<p style="color:red">Verification failed.</p>';
+      });
+    }
+
+    // Initialize Google Sign-In (client_id fetched from server)
+    window.onload = async () => {
+      const config = await fetch('/api/config').then(r => r.json());
+      google.accounts.id.initialize({
+        client_id: config.googleClientId,
+        callback: handleCredentialResponse,
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('signin'),
+        { theme: "outline", size: "large" }
+      );
+    };
+
+    // Toggle button logic
+    document.getElementById('toggleBtn').addEventListener('click', async () => {
+      if (!userToken) return;
+      const command = ledState ? 'off' : 'on';
+      const res = await fetch('/api/led', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + userToken
+        },
+        body: JSON.stringify({ command }),
+      });
+      const data = await res.json();
+      if (data.status === 'ok') {
+        ledState = !ledState;
+        document.getElementById('toggleBtn').textContent = ledState ? 'Turn Off' : 'Turn On';
+        document.getElementById('status').textContent = `LED is ${ledState ? 'ON' : 'OFF'}`;
+      } else {
+        document.getElementById('status').textContent = 'Error: ' + data.error;
+      }
+    });
+  </script>
+</body>
+</html>

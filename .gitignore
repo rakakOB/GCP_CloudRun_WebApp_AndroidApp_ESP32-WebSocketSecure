@@ -1,0 +1,32 @@
+# # Android application
+# android-ws
+
+# Personal notes
+details_fin.txt
+
+# Node
+node_modules/
+CloudRun_Backend_WebApp/node_modules/
+
+# Android build artifacts
+android-ws/ESP32LedApp/.gradle/
+android-ws/ESP32LedApp/build/
+android-ws/ESP32LedApp/app/build/
+android-ws/ESP32LedApp/local.properties
+*.apk
+*.aab
+
+# Environment files
+.env
+.env.local
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

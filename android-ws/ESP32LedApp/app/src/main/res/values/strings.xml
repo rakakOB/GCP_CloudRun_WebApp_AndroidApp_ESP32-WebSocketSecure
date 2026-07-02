@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ESP32 LED</string>
+    <string name="btn_toggle_on">Turn ON</string>
+    <string name="btn_toggle_off">Turn OFF</string>
+    <string name="status_led_on">LED is ON</string>
+    <string name="status_led_off">LED is OFF</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_no_esp32">No ESP32 connected to server</string>
+    <string name="status_error_prefix">Error:</string>
+    <string name="status_unauthorized">Access denied — you are not authorized</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="signing_out">Signing out…</string>
+</resources>
